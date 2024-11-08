@@ -3,7 +3,9 @@ import { body, param } from "express-validator";
 import { ProjectController } from "../controllers/ProjectController";
 import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
-import { validateProjectExist } from "../middleware/project";
+import { projectExist } from "../middleware/project";
+import { taskExists } from "../middleware/task";
+
 
 const router = Router();
 
@@ -25,7 +27,7 @@ router.post(
 
 // BUSCAR PROYECTOS //
 router.get("/", ProjectController.getAllProjects);
-
+ 
 // BUSCAR PROYECTO POR ID //
 router.get(
   "/:id",
@@ -61,7 +63,7 @@ router.delete(
 /** Routes for tasks */
 
 // CREAR TASK EN UN  PROYECTO //
-router.param("projectId", validateProjectExist);
+router.param("projectId", projectExist);
 
 router.post(
   "/:projectId/tasks",
@@ -72,6 +74,9 @@ router.post(
   handleInputErrors,
   TaskController.createTask
 );
+
+router.param("taskId", taskExists);
+//router.param("taskId", taskBelongsToProject);
 
 // OBTENER TODAS LAS TASK DE UN PROYECTO //
 router.get("/:projectId/tasks", TaskController.getProjectTasks);
@@ -108,7 +113,8 @@ router.post(
   "/:projectID/tasks/:taskId/status",
   param("taskId").isMongoId().withMessage("El id no es valido"),
   body("status").notEmpty().withMessage("El estado es obligatorio"),
-  handleInputErrors
-);
+  handleInputErrors,
+  TaskController.updateStatus
+); 
 
 export default router;
