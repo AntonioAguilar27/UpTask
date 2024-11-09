@@ -4,8 +4,9 @@ import { isValidObjectId } from "mongoose";
 
 export class ProjectController {
   static createProject = async (req: Request, res: Response) => {
+    const project =new Project(req.body);
     try {
-      await Project.create(req.body);
+      await project.save();
       res.send("proyecto creado correctamente");
     } catch (error) {
       console.log(error.message);
